@@ -7,13 +7,14 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
-import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser, removeUser } from "../utils/userSlice";
+import { BG_URL } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, seterrorMessage] = useState(null);
-
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const fullName = useRef(null);
   const email = useRef(null);
@@ -43,7 +44,9 @@ const Login = () => {
             displayName: fullName.current.value,
           })
             .then(() => {
-              navigate("/browse");
+              const { uid, email, displayName } = auth.currentUser;
+              dispatch(addUser({ uid, email, displayName }));
+              // navigate("/browse");
             })
             .catch((error) => {
               seterrorMessage(error.message);
@@ -52,7 +55,6 @@ const Login = () => {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          console.log("her");
           seterrorMessage(errorCode + " " + errorMessage);
         });
     } else {
@@ -63,8 +65,7 @@ const Login = () => {
       )
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
-          navigate("/browse");
+          // navigate("/browse");
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -78,10 +79,7 @@ const Login = () => {
     <div>
       <Header />
       <div className="absolute">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/563192ea-ac0e-4906-a865-ba9899ffafad/6b2842d1-2339-4f08-84f6-148e9fcbe01b/IN-en-20231218-popsignuptwoweeks-perspective_alpha_website_large.jpg"
-          alt="logo-netflix"
-        />
+        <img src={BG_URL} alt="logo-netflix" />
       </div>
 
       <form
